@@ -46,6 +46,15 @@ st.markdown("""
         margin-bottom: 0.5rem;
     }
     
+    .main-title-car {
+        font-size: 2.8rem !important;
+        font-weight: 800;
+        background: linear-gradient(90deg, #8B5CF6 0%, #EC4899 100%);
+        -webkit-background-clip: text;
+        -webkit-text-fill-color: transparent;
+        margin-bottom: 0.5rem;
+    }
+    
     .subtitle {
         font-size: 1.15rem;
         color: #6c757d;
@@ -66,6 +75,13 @@ st.markdown("""
         font-size: 2.2rem;
         font-weight: 700;
         color: #3B82F6;
+        margin: 5px 0;
+    }
+    
+    .metric-value-car {
+        font-size: 2.2rem;
+        font-weight: 700;
+        color: #8B5CF6;
         margin: 5px 0;
     }
     
@@ -101,11 +117,27 @@ st.markdown("""
         margin-bottom: 15px;
     }
     
+    .feature-box-car {
+        background-color: rgba(30, 41, 59, 0.5);
+        padding: 15px;
+        border-radius: 8px;
+        border-left: 5px solid #8B5CF6;
+        margin-bottom: 15px;
+    }
+    
     .insight-card {
         background: rgba(59, 130, 246, 0.05);
         border-radius: 8px;
         padding: 15px;
         border-left: 5px solid #3B82F6;
+        margin-bottom: 15px;
+    }
+    
+    .insight-card-car {
+        background: rgba(139, 92, 246, 0.05);
+        border-radius: 8px;
+        padding: 15px;
+        border-left: 5px solid #8B5CF6;
         margin-bottom: 15px;
     }
 </style>
@@ -115,7 +147,11 @@ st.markdown("""
 st.sidebar.markdown("# 🚀 CodeAlpha Internship")
 selected_task = st.sidebar.selectbox(
     "Choose Analysis Task",
-    ["🌸 Task 1: Iris Flower Classification", "📉 Task 2: Unemployment Analysis"]
+    [
+        "🌸 Task 1: Iris Flower Classification", 
+        "📉 Task 2: Unemployment Analysis",
+        "🚗 Task 3: Car Price Prediction"
+    ]
 )
 
 # --- TASK 1: IRIS FLOWER CLASSIFICATION ---
@@ -440,7 +476,6 @@ elif selected_task == "📉 Task 2: Unemployment Analysis":
             filtered_india = df_india[(df_india['Region'].isin(filter_states)) & (df_india['Area'] == selected_sector)]
 
         # --- Metrics Row ---
-        # Overall Averages from filtered detailed data
         avg_unemployment = filtered_detailed['Estimated Unemployment Rate (%)'].mean()
         peak_unemployment = filtered_detailed[filtered_detailed['Lockdown_Phase'] == 'Lockdown Peak (Apr-Jun 2020)']['Estimated Unemployment Rate (%)'].mean()
         avg_participation = filtered_detailed['Estimated Labour Participation Rate (%)'].mean()
@@ -449,7 +484,7 @@ elif selected_task == "📉 Task 2: Unemployment Analysis":
         with m_col1:
             st.markdown(f"""
             <div class="metric-container">
-                <div class="metric-label">Avg Unemployment Rate (Detailed)</div>
+                <div class="metric-label">Avg Unemployment Rate</div>
                 <div class="metric-value">{avg_unemployment:.2f}%</div>
                 <div style="font-size: 0.8rem; color: #6B7280;">Across Selected States (2020)</div>
             </div>
@@ -482,7 +517,6 @@ elif selected_task == "📉 Task 2: Unemployment Analysis":
                 st.write("Compare the timeline trends for the selected states. Notice the universal spike around April-May 2020.")
                 
                 fig, ax = plt.subplots(figsize=(8, 5))
-                # Plot average timeline
                 sns.lineplot(
                     data=filtered_detailed, x='Date', y='Estimated Unemployment Rate (%)', 
                     hue='Region', marker='o', linewidth=2.0, ax=ax
@@ -497,7 +531,6 @@ elif selected_task == "📉 Task 2: Unemployment Analysis":
                 st.markdown("#### ⚡ Impact of COVID-19 Lockdown Phases")
                 st.write("Average unemployment rate split by Pre-Lockdown, Lockdown Peak, and Recovery Phases.")
                 
-                # Period comparison bar plot for selected states
                 period_avg = filtered_detailed.groupby('Lockdown_Phase')['Estimated Unemployment Rate (%)'].mean().reset_index()
                 
                 fig, ax = plt.subplots(figsize=(7, 5))
@@ -514,7 +547,6 @@ elif selected_task == "📉 Task 2: Unemployment Analysis":
                 ax.set_ylabel("Average Unemployment Rate (%)")
                 ax.set_xlabel("Lockdown Phase")
                 
-                # Add values on top of bars
                 for bar in bars.patches:
                     yval = bar.get_height()
                     ax.text(bar.get_x() + bar.get_width()/2.0, yval + 0.3, f"{yval:.2f}%", ha='center', va='bottom', fontweight='semibold')
@@ -539,7 +571,6 @@ elif selected_task == "📉 Task 2: Unemployment Analysis":
                 st.markdown("#### 📅 Monthly Heatmap (Selected States)")
                 st.write("Observe monthly unemployment rate patterns for the selected states chronologically.")
                 
-                # Pivot
                 sorted_filtered = filtered_detailed.sort_values('Date')
                 pivot_tbl = sorted_filtered.pivot_table(
                     index='Region', 
@@ -571,7 +602,6 @@ elif selected_task == "📉 Task 2: Unemployment Analysis":
             })
             map_data['rate'] = map_data['rate'].round(2)
             
-            # Pydeck visualization
             view_state = pdk.ViewState(
                 latitude=22.9734,
                 longitude=78.6569,
@@ -584,7 +614,7 @@ elif selected_task == "📉 Task 2: Unemployment Analysis":
                 data=map_data,
                 get_position="[lon, lat]",
                 get_radius="rate * 10000",
-                get_fill_color="[239, 68, 68, 160]",  # Red
+                get_fill_color="[239, 68, 68, 160]",
                 pickable=True,
                 radius_min_pixels=5,
                 radius_max_pixels=60,
@@ -601,7 +631,6 @@ elif selected_task == "📉 Task 2: Unemployment Analysis":
 
         with utab3:
             st.markdown("### 💡 Policy Insights & Economic Takeaways")
-            
             st.markdown("""
             The data demonstrates a structural economic shock caused by the strict national lockdown implemented in India to curb the spread of COVID-19. 
             Below are the primary observations and economic recommendations derived from this analysis:
@@ -653,6 +682,227 @@ elif selected_task == "📉 Task 2: Unemployment Analysis":
                 **Policy Recommendation:** Incentivize labor-intensive manufacturing sectors (textiles, construction, food processing) and digital gig economy frameworks through infrastructure investments.
                 """)
                 st.markdown('</div>', unsafe_allow_html=True)
+
+# --- TASK 3: CAR PRICE PREDICTION ---
+elif selected_task == "🚗 Task 3: Car Price Prediction":
+    
+    # Load and clean Car Price dataset
+    @st.cache_data
+    def load_car_dataset():
+        file_path = os.path.join("car_price_data", "CarPrice_Assignment.csv")
+        df_car = pd.read_csv(file_path)
+        df_car['brand'] = df_car['CarName'].apply(lambda x: x.split(' ')[0].strip().lower())
+        brand_corrections = {
+            'maxda': 'mazda',
+            'toyouta': 'toyota',
+            'vokswagen': 'volkswagen',
+            'vw': 'volkswagen',
+            'porcshz': 'porsche',
+            'alfa-romero': 'alfa-romeo'
+        }
+        df_car['brand'] = df_car['brand'].replace(brand_corrections)
+        return df_car
+        
+    @st.cache_resource
+    def load_car_ml_components():
+        model_path = 'car_price_model.joblib'
+        brands_path = 'car_brands_list.joblib'
+        bodies_path = 'car_bodies_list.joblib'
+        fuels_path = 'car_fuels_list.joblib'
+        aspirations_path = 'car_aspirations_list.joblib'
+        drives_path = 'car_drives_list.joblib'
+        
+        if os.path.exists(model_path):
+            model_pl = joblib.load(model_path)
+            brands_list = joblib.load(brands_path)
+            bodies_list = joblib.load(bodies_path)
+            fuels_list = joblib.load(fuels_path)
+            aspirations_list = joblib.load(aspirations_path)
+            drives_list = joblib.load(drives_path)
+            return model_pl, brands_list, bodies_list, fuels_list, aspirations_list, drives_list
+        else:
+            return None, [], [], [], [], []
+
+    try:
+        df_car = load_car_dataset()
+        model_pl, brands_list, bodies_list, fuels_list, aspirations_list, drives_list = load_car_ml_components()
+        car_data_loaded = True
+    except Exception as e:
+        st.error(f"Error loading Car Price datasets: {e}. Please ensure the model training script ran successfully.")
+        car_data_loaded = False
+        
+    if car_data_loaded and model_pl is not None:
+        # Title
+        st.markdown('<div class="main-title-car">Car Price Prediction & Specification Valuation</div>', unsafe_allow_html=True)
+        st.markdown('<div class="subtitle">Real-time vehicle price valuation regression model trained on the Geely Auto dataset (R² = 95.75%)</div>', unsafe_allow_html=True)
+        
+        # --- Sidebar Controls ---
+        st.sidebar.markdown("### 🛠️ Car Specifications")
+        st.sidebar.write("Build your custom vehicle specs to predict its retail valuation instantly.")
+        
+        # Numeric sliders
+        hp = st.sidebar.slider("Horsepower (hp)", 45, 300, 104, step=5)
+        eng_size = st.sidebar.slider("Engine Size (cu in)", 50, 350, 120, step=5)
+        curb_wt = st.sidebar.slider("Curb Weight (lbs)", 1400, 4500, 2500, step=50)
+        c_mpg = st.sidebar.slider("City Mileage (mpg)", 10, 50, 25, step=1)
+        h_mpg = st.sidebar.slider("Highway Mileage (mpg)", 15, 60, 30, step=1)
+        w_base = st.sidebar.slider("Wheelbase (in)", 85.0, 125.0, 98.0, step=0.5)
+        c_len = st.sidebar.slider("Car Length (in)", 140.0, 210.0, 174.0, step=1.0)
+        c_wid = st.sidebar.slider("Car Width (in)", 60.0, 75.0, 66.0, step=0.5)
+        
+        # Categorical dropdowns
+        sel_brand = st.sidebar.selectbox("Brand Name (Goodwill)", brands_list, index=brands_list.index("toyota") if "toyota" in brands_list else 0)
+        sel_body = st.sidebar.selectbox("Car Body Type", bodies_list, index=bodies_list.index("sedan") if "sedan" in bodies_list else 0)
+        sel_fuel = st.sidebar.selectbox("Fuel Type", fuels_list)
+        sel_asp = st.sidebar.selectbox("Aspiration", aspirations_list)
+        sel_drive = st.sidebar.selectbox("Drive Wheel Type", drives_list, index=drives_list.index("fwd") if "fwd" in drives_list else 0)
+        
+        # Format user features
+        user_car_features = pd.DataFrame({
+            'horsepower': [hp],
+            'enginesize': [eng_size],
+            'curbweight': [curb_wt],
+            'citympg': [c_mpg],
+            'highwaympg': [h_mpg],
+            'wheelbase': [w_base],
+            'carlength': [c_len],
+            'carwidth': [c_wid],
+            'brand': [sel_brand],
+            'carbody': [sel_body],
+            'fueltype': [sel_fuel],
+            'aspiration': [sel_asp],
+            'drivewheel': [sel_drive]
+        })
+        
+        # Predict Price
+        predicted_price = model_pl.predict(user_car_features)[0]
+        
+        # Tabs Layout
+        ctab1, ctab2, ctab3 = st.tabs(["🔮 Real-Time Valuation", "📊 Market Distribution", "⚙️ Regression Diagnostics"])
+        
+        with ctab1:
+            col_c1, col_c2 = st.columns([1.1, 1.2], gap="large")
+            
+            with col_c1:
+                st.markdown("### 🚘 Valuation Result")
+                st.markdown(f"""
+                <div style="background: rgba(139, 92, 246, 0.08); border-radius: 12px; padding: 2rem; border: 2px solid #8B5CF6; text-align: center;">
+                    <h4>ESTIMATED RETAIL PRICE</h4>
+                    <div class="metric-value-car" style="font-size: 2.8rem;">${predicted_price:,.2f}</div>
+                    <p style="font-size: 1.1rem; color: #555;">Valuation Model Accuracy: <strong>95.75% R²</strong></p>
+                </div>
+                """, unsafe_allow_html=True)
+                
+                st.write("")
+                st.markdown("#### Vehicle Configuration details:")
+                st.markdown(f"""
+                <div class="feature-box-car">
+                    <strong>🏷️ Manufacturer:</strong> {sel_brand.upper()} ({sel_body.title()})<br>
+                    <strong>💪 Power & Engine:</strong> {hp} Horsepower | {eng_size} cu in Engine Size<br>
+                    <strong>⚖️ Body Specs:</strong> Weight: {curb_wt} lbs | Length: {c_len}" | Width: {c_wid}"<br>
+                    <strong>⛽ Powertrain:</strong> {sel_fuel.upper()} {sel_asp.title()} | {sel_drive.upper()} drive | City: {c_mpg} mpg | Hwy: {h_mpg} mpg
+                </div>
+                """, unsafe_allow_html=True)
+                
+            with col_c2:
+                st.markdown("### 🏷️ Brand Goodwill Market Position")
+                st.write(f"How does this custom configuration compare against other vehicles from **{sel_brand.title()}**?")
+                
+                # Brand stats
+                brand_cars = df_car[df_car['brand'] == sel_brand]
+                avg_brand_price = brand_cars['price'].mean()
+                min_brand_price = brand_cars['price'].min()
+                max_brand_price = brand_cars['price'].max()
+                
+                if not brand_cars.empty:
+                    st.write(f"The average market price for a **{sel_brand.title()}** is **${avg_brand_price:,.2f}**.")
+                    
+                    diff = predicted_price - avg_brand_price
+                    if diff > 0:
+                        st.success(f"📈 This custom configuration is priced **${diff:,.2f} higher** than the average {sel_brand.title()} due to premium specifications (e.g. higher horsepower or engine size).")
+                    else:
+                        st.info(f"📉 This custom configuration is priced **${abs(diff):,.2f} lower** than the average {sel_brand.title()} (budget/economy configuration).")
+                        
+                    # Bullet metrics
+                    st.markdown(f"""
+                    * **Lowest Brand Model Price:** `${min_brand_price:,.2f}`
+                    * **Highest Brand Model Price:** `${max_brand_price:,.2f}`
+                    * **Total Models in Dataset:** `{len(brand_cars)}`
+                    """)
+                else:
+                    st.write("No models from this brand exist in the training set (unknown category).")
+                    
+        with ctab2:
+            st.markdown("### 📊 Market Distribution Scatterplots")
+            st.write("See where your custom configuration (marked as the red star ⭐) lies in the broader vehicle market.")
+            
+            col_c3, col_c4 = st.columns(2)
+            
+            with col_c3:
+                st.markdown("#### Horsepower vs Price")
+                fig, ax = plt.subplots(figsize=(6, 4.2))
+                sns.scatterplot(data=df_car, x='horsepower', y='price', hue='fueltype', palette=['#3B82F6', '#EF4444'], alpha=0.7, ax=ax)
+                ax.scatter(hp, predicted_price, color='purple', marker='*', s=350, edgecolor='black', linewidth=1.5, label='Custom Spec')
+                ax.set_xlabel("Horsepower (hp)")
+                ax.set_ylabel("Price ($)")
+                ax.legend()
+                st.pyplot(fig)
+                
+            with col_c4:
+                st.markdown("#### Engine Size vs Price")
+                fig, ax = plt.subplots(figsize=(6, 4.2))
+                sns.scatterplot(data=df_car, x='enginesize', y='price', hue='aspiration', palette=['#10B981', '#F59E0B'], alpha=0.7, ax=ax)
+                ax.scatter(eng_size, predicted_price, color='purple', marker='*', s=350, edgecolor='black', linewidth=1.5, label='Custom Spec')
+                ax.set_xlabel("Engine Size (cu in)")
+                ax.set_ylabel("Price ($)")
+                ax.legend()
+                st.pyplot(fig)
+                
+            st.markdown("---")
+            st.markdown("#### Average Price per Body Style Type")
+            fig, ax = plt.subplots(figsize=(10, 4.5))
+            sns.boxplot(data=df_car, x='carbody', y='price', palette="pastel", width=0.5, ax=ax)
+            ax.set_ylabel("Price ($)")
+            ax.set_xlabel("Car Body Style")
+            st.pyplot(fig)
+
+        with ctab3:
+            st.markdown("### ⚙️ Regression Model Diagnostics")
+            st.write("The pricing system uses a **Random Forest Regressor** pipeline with preprocessor encoding steps.")
+            
+            col_c5, col_c6 = st.columns(2)
+            
+            with col_c5:
+                st.markdown("#### Model Performance Metrics")
+                st.markdown("""
+                Validated on a 20% test partition:
+                
+                | Metric | Value | Interpretation |
+                | :--- | :---: | :--- |
+                | **R² Score** | **95.75%** | Explains 95.75% of car price variance |
+                | **Mean Absolute Error (MAE)** | **$1,262.22** | Model predictions average $1,262 off actual |
+                | **Root Mean Squared Error (RMSE)** | **$1,830.96** | Measures standard deviation of residuals |
+                
+                Comparison of models tested during training pipeline:
+                * **Random Forest Regressor:** `95.75% R²`
+                * **Ridge Regression (alpha=1.0):** `88.19% R²`
+                * **Linear Regression:** `86.50% R²`
+                """)
+                
+            with col_c6:
+                st.markdown("#### Top 10 Feature Importances")
+                st.write("These features had the highest mathematical influence on predicting vehicle prices during Random Forest fitting:")
+                
+                # Load the static feature importance image or plot on the fly
+                # To be fast and self-contained, we can check if the file exists and display it
+                image_file = "static_plots/car_price_feature_importance.png"
+                if os.path.exists(image_file):
+                    st.image(image_file, use_container_width=True)
+                else:
+                    st.info("Feature importance plot is being generated on model training.")
+                    
+    elif car_data_loaded and model_pl is None:
+        st.warning("Training files not found. Please verify the `car_price_predictor.py` script ran successfully.")
 
 # --- Footer ---
 st.markdown("---")
